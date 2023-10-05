@@ -1,7 +1,7 @@
 import os
 import json
 import datetime
-print(os.getcwd())
+
 notes = []
 
 def add_note():
@@ -46,18 +46,26 @@ def delete_note():
   else:
     print("Заметка с таким ID не найдена")
 
-def show_notes(date=None):
-  if date:
-    filtered_notes = [note for note in notes if note["created"].startswith(date)]
-  else:
+def show_notes(date=None, title=None, note_id=None):
     filtered_notes = notes
 
-  for note in filtered_notes:
-    print(f"ID: {note['id']}")
-    print(f"Заголовок: {note['title']}") 
-    print(f"Тело: {note['body']}")
-    print(f"Дата создания: {note['created']}")
-    print("-"*40)
+    if date:
+        filtered_notes = [note for note in filtered_notes if note["created"].startswith(date)]
+    if title:
+        filtered_notes = [note for note in filtered_notes if title.lower() in note["title"].lower()]
+    if note_id:
+        filtered_notes = [note for note in filtered_notes if note["id"] == note_id]
+
+    if not filtered_notes:
+        print("Заметки не найдены.")
+        return
+
+    for note in filtered_notes:
+        print(f"ID: {note['id']}")
+        print(f"Заголовок: {note['title']}") 
+        print(f"Тело: {note['body']}")
+        print(f"Дата создания: {note['created']}")
+        print("-" * 40)
 
 def save_notes():
     with open("notes.json", "w", encoding="utf-8") as f:
@@ -89,8 +97,21 @@ def main():
     elif command == "delete":
       delete_note()
     elif command == "show":
-      date = input("Введите дату для фильтрации в формате дд-мм-гггг (Нажмите Enter для показа всех): ")
-      show_notes(date)
+            filter_choice = input("Выберите фильтр (date, title, id) или Enter для показа всех: ").strip().lower()
+            if filter_choice == "date":
+                date = input("Введите дату для фильтрации в формате дд-мм-гггг: ")
+                show_notes(date=date)
+            elif filter_choice == "title":
+                title = input("Введите часть заголовка для фильтрации: ")
+                show_notes(title=title)
+            elif filter_choice == "id":
+                try:
+                    note_id = int(input("Введите ID заметки для фильтрации: "))
+                    show_notes(note_id=note_id)
+                except ValueError:
+                    print("Некорректный ID. Пожалуйста, введите целое число.")
+            else:
+                show_notes()
     elif command == "save":
       save_notes() 
     elif command == "exit":
