@@ -77,7 +77,6 @@ def load_notes():
                             print(f"Ошибка при загрузке заметки: {note_str}")
 
 def main():
-  load_notes()
 
   while True:
     command = input("Введите команду (add, edit, delete, show, save, exit): ")
@@ -94,9 +93,11 @@ def main():
     elif command == "save":
       save_notes() 
     elif command == "exit":
+      save_notes()
       break
     else:
       print("Неизвестная команда")
 
 if __name__ == "__main__":
+  load_notes()
   main()
