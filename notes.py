@@ -7,9 +7,12 @@ notes = []
 def add_note():
   title = input("Введите заголовок заметки: ")
   body = input("Введите тело заметки: ")
-
+  
+  max_id = max(note['id'] for note in notes) if notes else 0
+  new_id = max_id + 1
+    
   note = {
-    "id": len(notes) + 1, 
+    "id": new_id, 
     "title": title,
     "body": body,
     "created": datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
@@ -59,22 +62,20 @@ def show_notes(date=None):
 def save_notes():
     with open("notes.json", "w", encoding="utf-8") as f:
         json.dump(notes, f, ensure_ascii=False, indent=2)
-     
+
 def load_notes():
     global notes
-    if os.path.exists("notes.json"):  
+    if os.path.exists("notes.json"):
         with open("notes.json", encoding="utf-8") as f:
-            notes_str = f.read()
-            if notes_str:
-                notes_list = notes_str.split("\n")
-    
-                for note_str in notes_list:
-                    if note_str:
-                        try:
-                            note = json.loads(note_str)
-                            notes.append(note)
-                        except json.JSONDecodeError:
-                            print(f"Ошибка при загрузке заметки: {note_str}")
+            try:
+                notes = json.load(f)
+            except json.JSONDecodeError:
+                print("Ошибка при загрузке заметок. Создан новый список заметок.")
+                notes = []
+    else:
+        print("Файл notes.json не существует. Создан новый список заметок.")
+        notes = []
+
 
 def main():
 
